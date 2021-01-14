@@ -43,6 +43,8 @@ output_stream: "ROIS_FROM_LANDMARKS:face_rects_from_landmarks"
 # Regions of interest calculated based on face detections.
 # (std::vector<NormalizedRect>)
 output_stream: "ROIS_FROM_DETECTIONS:face_rects_from_detections"
+# (int)
+output_stream: "FACE_COUNT_FROM_LANDMARKS:face_count"
 
 # Defines whether landmarks on the previous image should be used to help
 # localize landmarks on the current image.
@@ -187,6 +189,13 @@ node {
   input_stream: "IMAGE:landmarks_loop_image"
   input_stream: "ROI:face_rect"
   output_stream: "LANDMARKS:face_landmarks"
+}
+
+node {
+  calculator: "CountingNormalizedLandmarkListVectorSizeCalculator"
+  input_stream: "CLOCK:image"
+  input_stream: "VECTOR:multi_face_landmarks"
+  output_stream: "COUNT:face_count"
 }
 
 # Calculates region of interest based on face landmarks, so that can be reused

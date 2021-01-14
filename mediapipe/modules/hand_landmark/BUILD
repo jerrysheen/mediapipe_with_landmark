@@ -105,8 +105,12 @@ mediapipe_simple_subgraph(
         "//mediapipe/calculators/util:collection_has_min_size_calculator",
         "//mediapipe/calculators/util:filter_collection_calculator",
         "//mediapipe/modules/palm_detection:palm_detection_gpu",
+        "//mediapipe/calculators/util:counting_vector_size_calculator",
+    	
     ],
 )
+# add "//mediapipe/calculators/util:counting_vector_size_calculator",
+
 
 mediapipe_simple_subgraph(
     name = "palm_detection_detection_to_roi",

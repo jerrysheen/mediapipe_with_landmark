@@ -41,3 +41,11 @@ cc_binary(
         "//mediapipe/graphs/object_detection:desktop_tflite_calculators",
     ],
 )
+
+cc_binary(
+    name = "object_detection_out_cpu",
+    deps = [
+        "//mediapipe/examples/desktop:demo_run_graph_main_out",
+        "//mediapipe/graphs/object_detection:desktop_tflite_calculators",
+    ],
+)

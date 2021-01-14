@@ -89,6 +89,9 @@ output_stream: "DETECTION:pose_detection"
 output_stream: "ROI_FROM_LANDMARKS:pose_rect_from_landmarks"
 # Regions of interest calculated based on pose detections. (NormalizedRect)
 output_stream: "ROI_FROM_DETECTION:pose_rect_from_detection"
+# (int)
+output_stream: "LANDMARK_COUNT_FROM_LANDMARK:pose_count"
+
 
 # Defines whether landmarks on the previous image should be used to help
 # localize landmarks on the current image.
@@ -170,6 +173,9 @@ node {
   output_stream: "ROI:pose_rect_from_detection"
 }
 
+
+
+
 # Selects either pose rect (or ROI) calculated from detection or from previously
 # detected landmarks if available (in this case, calculation of pose rect from
 # detection is skipped).
@@ -201,6 +207,15 @@ node {
   output_stream: "FILTERED_AUX_NORM_LANDMARKS:auxiliary_landmarks"
 }
 
+# calculate the num of rect
+node {
+   calculator: "CountingNormalizedLandmarkVectorSizeCalculator"
+   input_stream: "CLOCK:image"
+   input_stream: "VECTOR:pose_landmarks"
+   output_stream: "COUNT:pose_count"
+}
+
+
 # Calculates region of interest based on the auxiliary landmarks, to be used in
 # the subsequent image.
 node {
@@ -209,6 +224,7 @@ node {
   input_stream: "IMAGE_SIZE:image_size"
   output_stream: "ROI:pose_rect_from_landmarks"
 }
+
 
 # Caches pose rects calculated from landmarks, and upon the arrival of the next
 # input image, sends out the cached rects with timestamps replaced by that of

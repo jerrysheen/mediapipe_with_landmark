@@ -7,6 +7,8 @@ input_stream: "input_video"
 output_stream: "output_video"
 # Pose landmarks. (NormalizedLandmarkList)
 output_stream: "pose_landmarks"
+output_stream: "roi_from_landmarks"
+output_stream: "pose_count"
 
 # Throttles the images flowing downstream for flow control. It passes through
 # the very first incoming image unaltered, and waits for downstream nodes
@@ -36,6 +38,7 @@ node {
   output_stream: "LANDMARKS:pose_landmarks"
   output_stream: "DETECTION:pose_detection"
   output_stream: "ROI_FROM_LANDMARKS:roi_from_landmarks"
+  output_stream: "LANDMARK_COUNT_FROM_LANDMARK:pose_count"
 }
 
 # Calculates size of the image.

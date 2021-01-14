@@ -37,6 +37,9 @@ output_stream: "HAND_ROIS_FROM_LANDMARKS:hand_rects"
 # Regions of interest calculated based on palm detections.
 # (std::vector<NormalizedRect>)
 output_stream: "HAND_ROIS_FROM_PALM_DETECTIONS:hand_rects_from_palm_detections"
+# (int)
+output_stream: "HAND_COUNT_FROM_LANDMARKS:hand_count"
+
 
 # Defines whether landmarks on the previous image should be used to help
 # localize landmarks on the current image.
@@ -212,6 +215,15 @@ node {
   output_stream: "ITERABLE:multi_hand_landmarks"
 }
 
+
+# add our hands counter to count the hands number
+node {
+  calculator: "CountingNormalizedLandmarkListVectorSizeCalculator"
+  input_stream: "CLOCK:image"
+  input_stream: "VECTOR:multi_hand_landmarks"
+  output_stream: "COUNT:hand_count"
+}
+
 # Collects a NormalizedRect for each hand into a vector. Upon receiving the
 # BATCH_END timestamp, outputs the vector of NormalizedRect at the BATCH_END
 # timestamp.
@@ -221,6 +233,7 @@ node {
   input_stream: "BATCH_END:hand_rects_timestamp"
   output_stream: "ITERABLE:hand_rects_from_landmarks"
 }
+
 
 # Caches hand rects calculated from landmarks, and upon the arrival of the next
 # input image, sends out the cached rects with timestamps replaced by that of

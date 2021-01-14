@@ -24,6 +24,14 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "pose_tracking_out_cpu",
+    deps = [
+        "//mediapipe/examples/desktop:pose_out",
+        "//mediapipe/graphs/pose_tracking:pose_tracking_cpu_deps",
+    ],
+)
+
 # Linux only
 cc_binary(
     name = "pose_tracking_gpu",

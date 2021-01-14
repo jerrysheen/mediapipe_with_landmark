@@ -1,21 +1,4 @@
----
-layout: default
-title: Home
-nav_order: 1
----
-
-![MediaPipe](docs/images/mediapipe_small.png)
-
---------------------------------------------------------------------------------
-
-## Live ML anywhere
-
-[MediaPipe](https://github.com/google/mediapipe/) check the original github page..
-ML solutions for live and streaming media.
-
-
-
-## To run hand_tracking demo:
+## For run hand_tracking demo:
 you can run hand_tracking demo, and get landmark and rect info without frame stuck using the following command:
 
 **build:**
@@ -24,7 +7,7 @@ you can run hand_tracking demo, and get landmark and rect info without frame stu
 `bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_tracking_out_cpu --calculator_graph_config_file=mediapipe/graphs/hand_tracking/hand_tracking_desktop_live.pbtxt`
 
 
-## To run face_mesh demo:
+## For run face_mesh demo:
 you can run face_mesh demo, and get landmark and rect info without frame stuck using the following command:
 
 **build:**
@@ -32,7 +15,7 @@ you can run face_mesh demo, and get landmark and rect info without frame stuck u
 **run:**
 `bazel-bin/mediapipe/examples/desktop/face_mesh/face_mesh_out_cpu --calculator_graph_config_file=mediapipe/graphs/face_mesh/face_mesh_desktop_live.pbtxt`
 
-## To run face_mesh demo:
+## For run face_mesh demo:
 
 **build:**
 `bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/pose_tracking:pose_tracking_out_cpu`

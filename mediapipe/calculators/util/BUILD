@@ -1135,3 +1135,40 @@ cc_library(
     ],
     alwayslink = 1,
 )
+
+# this is for new calculator, the main use is to prevent face_mesh from crush.
+cc_library(
+    name = "counting_vector_size_calculator",
+    srcs = ["counting_vector_size_calculator.cc"],
+    hdrs = ["counting_vector_size_calculator.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+    ],
+    alwayslink = 1,
+)
+
+
+
+cc_library(
+    name = "counting_landmark_num_calculator",
+    srcs = ["counting_landmark_num_calculator.cc"],
+    hdrs = ["counting_landmark_num_calculator.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+    ],
+    alwayslink = 1,
+)
+
+
+
+
+
+

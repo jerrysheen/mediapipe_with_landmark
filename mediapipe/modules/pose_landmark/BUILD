@@ -120,6 +120,7 @@ mediapipe_simple_subgraph(
         "//mediapipe/calculators/core:split_vector_calculator",
         "//mediapipe/calculators/image:image_properties_calculator",
         "//mediapipe/modules/pose_detection:pose_detection_cpu",
+        "//mediapipe/calculators/util:counting_landmark_num_calculator",
     ],
 )
 

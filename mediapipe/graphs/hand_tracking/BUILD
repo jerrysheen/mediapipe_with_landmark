@@ -47,6 +47,7 @@ cc_library(
         "//mediapipe/graphs/hand_tracking/subgraphs:hand_renderer_cpu",
         "//mediapipe/modules/hand_landmark:hand_landmark_tracking_cpu",
         "//mediapipe/modules/palm_detection:palm_detection_cpu",
+        "//mediapipe/calculators/core:packet_presence_calculator"
     ],
 )
 

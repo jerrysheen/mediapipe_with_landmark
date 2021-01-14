@@ -188,10 +188,11 @@ http_archive(
     urls = ["https://github.com/opencv/opencv/archive/3.4.10.tar.gz"],
 )
 
+# modified_ change path from /usr to /usr.local
 new_local_repository(
     name = "linux_opencv",
     build_file = "@//third_party:opencv_linux.BUILD",
-    path = "/usr",
+    path = "/usr/local",
 )
 
 new_local_repository(

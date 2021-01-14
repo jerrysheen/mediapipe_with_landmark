@@ -44,6 +44,7 @@ output_stream: "ROIS_FROM_LANDMARKS:face_rects_from_landmarks"
 # (std::vector<NormalizedRect>)
 output_stream: "ROIS_FROM_DETECTIONS:face_rects_from_detections"
 
+
 # Defines whether landmarks on the previous image should be used to help
 # localize landmarks on the current image.
 node {
@@ -207,6 +208,8 @@ node {
   input_stream: "BATCH_END:landmarks_loop_end_timestamp"
   output_stream: "ITERABLE:multi_face_landmarks"
 }
+
+
 
 # Collects a NormalizedRect for each face into a vector. Upon receiving the
 # BATCH_END timestamp, outputs the vector of NormalizedRect at the BATCH_END

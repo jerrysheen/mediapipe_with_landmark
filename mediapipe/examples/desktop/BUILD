@@ -48,8 +48,79 @@ cc_library(
         "//mediapipe/framework/port:opencv_video",
         "//mediapipe/framework/port:parse_text_proto",
         "//mediapipe/framework/port:status",
+
+        "//mediapipe/calculators/util:landmarks_to_render_data_calculator",
+        "//mediapipe/framework/formats:landmark_cc_proto",
     ],
 )
+
+cc_library(
+    name = "pose_out",
+    srcs = ["pose_out.cc"],
+    deps = [
+        "//mediapipe/calculators/util:landmarks_to_render_data_calculator",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/formats:image_frame_opencv",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+       "//mediapipe/framework/port:commandlineflags",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:opencv_highgui",
+        "//mediapipe/framework/port:opencv_imgproc",
+        "//mediapipe/framework/port:opencv_video",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+        "//mediapipe/calculators/util:rect_to_render_data_calculator",
+	"//mediapipe/framework/formats:rect_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "hand_out",
+    srcs = ["hand_out.cc"],
+    deps = [
+        "//mediapipe/calculators/util:landmarks_to_render_data_calculator",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/formats:image_frame_opencv",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+       "//mediapipe/framework/port:commandlineflags",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:opencv_highgui",
+        "//mediapipe/framework/port:opencv_imgproc",
+        "//mediapipe/framework/port:opencv_video",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+        "//mediapipe/calculators/util:rect_to_render_data_calculator",
+	"//mediapipe/framework/formats:rect_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "face_out",
+    srcs = ["face_out.cc"],
+    deps = [
+        "//mediapipe/calculators/util:landmarks_to_render_data_calculator",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/formats:image_frame_opencv",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+       "//mediapipe/framework/port:commandlineflags",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:opencv_highgui",
+        "//mediapipe/framework/port:opencv_imgproc",
+        "//mediapipe/framework/port:opencv_video",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+        "//mediapipe/calculators/util:rect_to_render_data_calculator",
+	"//mediapipe/framework/formats:rect_cc_proto",
+    ],
+)
+
+
+
+
+
 
 # Linux only.
 # Must have a GPU with EGL support:

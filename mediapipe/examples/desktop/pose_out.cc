@@ -13,7 +13,6 @@
 // limitations under the License.
 //
 // An example of sending OpenCV webcam frames into a MediaPipe graph.
-#include <cstdlib>
 
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/image_frame.h"
@@ -26,23 +25,33 @@
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
 
-//....................................................................................
 //Take stream from /mediapipe/graphs/hand_tracking/hand_detection_desktop_live.pbtxt
 // RendererSubgraph - LANDMARKS:hand_landmarks
 #include "mediapipe/calculators/util/landmarks_to_render_data_calculator.pb.h"
 #include "mediapipe/framework/formats/landmark.pb.h"
+//...................................................................
+// try to add rect code into this 
+#include "mediapipe/framework/formats/rect.pb.h"
+#include "mediapipe/calculators/util/rect_to_render_data_calculator.pb.h"
+//...................................................................
 
-//....................................................................................
 
+#include <typeinfo>
 
+// input and output streams to be used/retrieved by calculators
 constexpr char kInputStream[] = "input_video";
 constexpr char kOutputStream[] = "output_video";
+constexpr char kOutputLandmarksStream[] = "pose_landmarks";
 constexpr char kWindowName[] = "MediaPipe";
-//....................................................................................
-// define landmark constant
-constexpr char kLandmarksStream[] = "hand_landmarks";
-//....................................................................................
 
+
+// get the rect data in to our program..........................................
+constexpr char kLandmarksRectStream[] = "roi_from_landmarks";
+constexpr char kOutputFaceCountStream[] = "pose_count";
+// get the rect data in to our program..........................................
+
+
+// cli inputs
 DEFINE_string(
     calculator_graph_config_file, "",
     "Name of file containing text format CalculatorGraphConfig proto.");
@@ -54,7 +63,6 @@ DEFINE_string(output_video_path, "",
               "If not provided, show result in a window.");
 
 ::mediapipe::Status RunMPPGraph() {
-  // 配置读取图的信息
   std::string calculator_graph_config_contents;
   MP_RETURN_IF_ERROR(mediapipe::file::GetContents(
       FLAGS_calculator_graph_config_file, &calculator_graph_config_contents));
@@ -75,47 +83,48 @@ DEFINE_string(output_video_path, "",
     capture.open(FLAGS_input_video_path);
   } else {
     capture.open(0);
-    
   }
   RET_CHECK(capture.isOpened());
 
   cv::VideoWriter writer;
   const bool save_video = !FLAGS_output_video_path.empty();
-  if (!save_video) {
+  if (save_video) {
+    LOG(INFO) << "Prepare video writer.";
+    cv::Mat test_frame;
+    capture.read(test_frame);                    // Consume first frame.
+    capture.set(cv::CAP_PROP_POS_AVI_RATIO, 0);  // Rewind to beginning.
+    writer.open(FLAGS_output_video_path,
+                mediapipe::fourcc('a', 'v', 'c', '1'),  // .mp4
+                capture.get(cv::CAP_PROP_FPS), test_frame.size());
+    RET_CHECK(writer.isOpened());
+  } else {
     cv::namedWindow(kWindowName, /*flags=WINDOW_AUTOSIZE*/ 1);
-#if (CV_MAJOR_VERSION >= 3) && (CV_MINOR_VERSION >= 2)
-    capture.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-    capture.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-    capture.set(cv::CAP_PROP_FPS, 30);
-#endif
   }
 
-  LOG(INFO) << "Start running the calculator graph.";
-  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
+  // pollers to retrieve streams from graph
+  // output stream (i.e. rendered landmark frame)
+  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller image_poller,
                    graph.AddOutputStreamPoller(kOutputStream));
-  //....................................................................................
-  // 需要定义这个kLndmarkStearm, 并且在图中添加一个outputStream
-  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller_landmark,
-            graph.AddOutputStreamPoller(kLandmarksStream));
-  //....................................................................................
+  // hand landmarks stream
+    ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller landmarks_poller,
+                   graph.AddOutputStreamPoller(kOutputLandmarksStream));
+  //hand landmarks_rect stream.................................
+  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller_landmark_rect,
+            graph.AddOutputStreamPoller(kLandmarksRectStream));
+  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller rect_count_poller,
+            graph.AddOutputStreamPoller(kOutputFaceCountStream));
+  
+  LOG(INFO) << "Start running the calculator graph.";
   MP_RETURN_IF_ERROR(graph.StartRun({}));
 
   LOG(INFO) << "Start grabbing and processing frames.";
-  bool grab_frames = true;
 
-  //..........
+  bool grab_frames = true;
   while (grab_frames) {
     // Capture opencv camera or video frame.
     cv::Mat camera_frame_raw;
     capture >> camera_frame_raw;
-    if (camera_frame_raw.empty()) {
-      if (!load_video) {
-        LOG(INFO) << "Ignore empty frames from camera.";
-        continue;
-      }
-      LOG(INFO) << "Empty frame, end of video reached.";
-      break;
-    }
+    if (camera_frame_raw.empty()) break;  // End of video.
     cv::Mat camera_frame;
     cv::cvtColor(camera_frame_raw, camera_frame, cv::COLOR_BGR2RGB);
     if (!load_video) {
@@ -123,7 +132,6 @@ DEFINE_string(output_video_path, "",
     }
 
     // Wrap Mat into an ImageFrame.
-    // 将图像数据Mat 转换成ImageFrame类型
     auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
         mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows,
         mediapipe::ImageFrame::kDefaultAlignmentBoundary);
@@ -138,44 +146,53 @@ DEFINE_string(output_video_path, "",
                           .At(mediapipe::Timestamp(frame_timestamp_us))));
 
     // Get the graph result packet, or stop if that fails.
-    // 这个包本来是数据流的类型，现在把他转换成能够输出的文件
-    mediapipe::Packet packet;
-    if (!poller.Next(&packet)) break;
-    auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+    mediapipe::Packet image_packet;
+    if (!image_poller.Next(&image_packet)) break;
+    auto& output_frame = image_packet.Get<mediapipe::ImageFrame>();
 
-//....................................................................................
-// 接受新的数据流
 
-    // Get the graph result packet, or stop if that fails.
-    mediapipe::Packet landmark_packet;
-    //Polling the poller to get landmark packet
-    if (!poller_landmark.Next(&landmark_packet)) break;
-    // 接受了这个数据流
-    auto& output_landmarks = landmark_packet.Get<std::vector<::mediapipe::NormalizedLandmark>>();
+    mediapipe::Packet rect_count_packet;
+    if (!rect_count_poller.Next(&rect_count_packet)) break;
+    auto& rect_count = rect_count_packet.Get<int>();
+    
+    if(rect_count > 0){
 
-//....................................................................................
+      mediapipe::Packet landmark_packet;
+      //Polling the poller to get landmark packet
+      if (!landmarks_poller.Next(&landmark_packet)) break;
+      
+      auto& landmarks = landmark_packet.Get<mediapipe::NormalizedLandmarkList>();
+      std::cout << "waiting...............\n";
+      std::cout << landmarks.DebugString();
+      std::cout << "...............\n";
+      
+      // you can check type using this code......
+      // std:: cout << typeid(landmarks.DebugString()).name();
+      //
+      // using this code , you can get the list, the size will be 33.
+      // landmarks.landmark_size();
+
+
+      //hand landmarks_rect  print ....................................
+      
+      mediapipe::Packet landmark_rect_packet;
+      if (!poller_landmark_rect.Next(&landmark_rect_packet)) break;
+      auto& output_landmarks_rect = landmark_rect_packet.Get<::mediapipe::NormalizedRect>();
+      //printout the hand rectangle
+      std::cout << "start to received rct data\n";
+      std::cout << output_landmarks_rect.DebugString();
+    }
 
     // Convert back to opencv for display or saving.
-    // output_frame_mat 这个是直接可以输出的文件
     cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
     cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
     if (save_video) {
-      if (!writer.isOpened()) {
-        LOG(INFO) << "Prepare video writer.";
-        writer.open(FLAGS_output_video_path,
-                    mediapipe::fourcc('a', 'v', 'c', '1'),  // .mp4
-                    capture.get(cv::CAP_PROP_FPS), output_frame_mat.size());
-        RET_CHECK(writer.isOpened());
-      }
       writer.write(output_frame_mat);
     } else {
       cv::imshow(kWindowName, output_frame_mat);
       // Press any key to exit.
       const int pressed_key = cv::waitKey(5);
       if (pressed_key >= 0 && pressed_key != 255) grab_frames = false;
-    }
-    for (const ::mediapipe::NormalizedLandmark& landmark : output_landmarks) {
-          std::cout << landmark.DebugString();
     }
   }
 
@@ -185,15 +202,17 @@ DEFINE_string(output_video_path, "",
   return graph.WaitUntilDone();
 }
 
+
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  mediapipe::Status run_status = RunMPPGraph();
+  ::mediapipe::Status run_status = RunMPPGraph();
   if (!run_status.ok()) {
-    LOG(ERROR) << "Failed to run the graph:... " << run_status.message();
-    return EXIT_FAILURE;
+    std::cout << run_status.message();
+    LOG(ERROR) << "Failed to run the graph: " << run_status.message();
+    
   } else {
     LOG(INFO) << "Success!";
   }
-  return EXIT_SUCCESS;
+  return 0;
 }
