@@ -14,8 +14,7 @@
 //
 // An example of sending OpenCV webcam frames into a MediaPipe graph.
 #include <cstdlib>
-#include <regex>
-#include <vector>
+
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/image_frame.h"
 #include "mediapipe/framework/formats/image_frame_opencv.h"
@@ -36,6 +35,10 @@
 #include "mediapipe/framework/formats/rect.pb.h"
 #include "mediapipe/calculators/util/rect_to_render_data_calculator.pb.h"
 
+
+#include <regex>
+#include <vector>
+#include "mediapipe/tools/generate_vector.h"
 
 using namespace std;
 
@@ -184,51 +187,10 @@ mediapipe::Status RunMPPGraph() {
         //string str = landmark.DebugString();
         string str = landmark.DebugString();
         // insert code here...
-        //string str = "landmark {\n  x: 0.613949597\n  y: 0.512591064\n  z: -0.00256898953\n  visibility: 1\n  presence: 0.996413052\n}\nlandmark {\n  x: 0.611436605\n  y: 0.460630834\n  z: 0.00740333134\n  visibility: 1\n  presence: 0.993446052\n}\nlandmark {\n  x: 0.621986091\n  y: 0.460139275\n  z: -0.012594508\n  visibility: 0.999970436\n  presence: 0.992199838\n}\nlandmark {\n  x: 0.632396579\n  y: 0.45973289\n  z: -0.0055285017\n  visibility: 1\n  presence: 0.990741372\n}\nlandmark {\n  x: 0.572493136\n  y: 0.4619295\n  z: 0.000160436204\n  visibility: 1\n  presence: 0.996003449\n}\nlandmark {\n  x: 0.55606997\n  y: 0.462284327\n  z: 0.00086248375\n  visibility: 0.999983072\n  presence: 0.99661094\n}\nlandmark {\n  x: 0.539810061\n  y: 0.462845564\n  z: -0.00561079429\n  visibility: 1\n  presence: 0.99584806\n}\nlandmark {\n  x: 0.611480474\n  y: 0.477871656\n  z: -0.00129700301\n  visibility: 0.999875784\n  presence: 0.99706\n}\nlandmark {\n  x: 0.488170177\n  y: 0.486361384\n  z: 0.00296257483\n  visibility: 0.999917269\n  presence: 0.997121274\n}\nlandmark {\n  x: 0.619232595\n  y: 0.567374766\n  z: 0.00334401568\n  visibility: 0.9999\n  presence: 0.999299765\n}\nlandmark {\n  x: 0.569764555\n  y: 0.569226623\n  z: 0.00274809683\n  visibility: 0.999966383\n  presence: 0.999711215\n}\nlandmark {\n  x: 0.693515658\n  y: 0.71861738\n  z: -0.331908435\n  visibility: 0.999950409\n  presence: 0.999360144\n}\nlandmark {\n  x: 0.359382868\n  y: 0.745541513\n  z: -0.446730971\n  visibility: 0.999966621\n  presence: 0.999299049\n}\nlandmark {\n  x: 0.854609847\n  y: 0.986356258\n  z: -0.0496203899\n  visibility: 0.426453233\n  presence: 0.575895548\n}\nlandmark {\n  x: 0.294551075\n  y: 1.09573519\n  z: -0.253446579\n  visibility: 0.307693303\n  presence: 0.344096214\n}\nlandmark {\n  x: 0.995646119\n  y: 1.19363952\n  z: -0.231866375\n  visibility: 0.0917004868\n  presence: 0.0510586463\n}\nlandmark {\n  x: 0.290956229\n  y: 1.37292445\n  z: -0.347637683\n  visibility: 0.13372393\n  presence: 0.0619239025\n}\nlandmark {\n  x: 1.05973673\n  y: 1.25733399\n  z: -0.265884429\n  visibility: 0.0883765593\n  presence: 0.0317905508\n}\nlandmark {\n  x: 0.252514035\n  y: 1.46270847\n  z: -0.409361899\n  visibility: 0.10280589\n  presence: 0.03726184\n}\nlandmark {\n  x: 1.03619456\n  y: 1.27368474\n  z: -0.307165563\n  visibility: 0.137550548\n  presence: 0.0426366404\n}\nlandmark {\n  x: 0.299845159\n  y: 1.47575617\n  z: -0.446936309\n  visibility: 0.156356648\n  presence: 0.0543562509\n}\nlandmark {\n  x: 1.00429773\n  y: 1.25669742\n  z: -0.29283461\n  visibility: 0.149947524\n  presence: 0.0422711261\n}\nlandmark {\n  x: 0.320839852\n  y: 1.44397771\n  z: -0.432022244\n  visibility: 0.183153272\n  presence: 0.0603121817\n}\nlandmark {\n  x: 0.670869589\n  y: 1.34571433\n  z: 0.103311144\n  visibility: 0.0265163947\n  presence: 0.00194624288\n}\nlandmark {\n  x: 0.449693263\n  y: 1.36372232\n  z: -0.0709834844\n  visibility: 0.0179650653\n  presence: 0.00184070901\n}\nlandmark {\n  x: 0.677823\n  y: 1.82070255\n  z: 0.202397808\n  visibility: 2.81318371e-05\n  presence: 0.000949093199\n}\nlandmark {\n  x: 0.461592495\n  y: 1.82459021\n  z: 0.128505141\n  visibility: 4.49201543e-05\n  presence: 0.000335714954\n}\nlandmark {\n  x: 0.672832251\n  y: 2.23668718\n  z: 0.401643395\n  visibility: 4.92473919e-06\n  presence: 0.000119101358\n}\nlandmark {\n  x: 0.453322977\n  y: 2.24761581\n  z: 0.164003715\n  visibility: 2.65558756e-05\n  presence: 6.38726706e-05\n}\nlandmark {\n  x: 0.671541214\n  y: 2.30948019\n  z: 0.422435731\n  visibility: 7.93545769e-06\n  presence: 0.00013375617\n}\nlandmark {\n  x: 0.442752838\n  y: 2.32013273/n  z: 0.234550849\n  visibility: 2.83206391e-05\n  presence: 6.89925655e-05\n}\nlandmark {\n  x: 0.679653049\n  y: 2.36415768\n  z: 0.415985525\n  visibility: 6.93967195e-06\n  presence: 0.000137792522\n}\nlandmark {\n  x: 0.517023504\n  y: 2.37463856\n  z: 0.280007362\n  visibility: 2.20659531e-05\n  presence: 6.99142256e-05\n}\n\nstart to received rct data\nx_center: 0.560146093\ny_center: 1.35494471\nheight: 3.12043524\nwidth: 2.34032631\nrotation: -0.072670579\n";
-        //cout << str << endl;
-        
-        // regular expression 取值    
-        std::regex reg("[\\\n|\\s]");
-        // output: hello, world!
-        str = regex_replace(str, reg, "");
-        //cout << str << endl;
-        //cout << str << endl;
-        smatch result;
-        //regex pattern("\\{([^}]*)\\}");    //{中的内容}
-        regex pattern("x([^z]*)");
-        regex_search(str, result, pattern);    
-        //遍历结果
-        
-        //迭代器声明
-        string::const_iterator iterStart = str.begin();
-        string::const_iterator iterEnd = str.end();
-        regex pattern1("[\\d|.]+[^y]");
-        regex pattern2("y:.+");
-        smatch xcord;
-        smatch ycord;
-        double x;
-        double y; 
+
+        // using regular expression to get the cordinate.
         vector<vector<double>> cordinate_collection;
-        // result 0 x:0.74297905y:0.690012038
-        while (regex_search(iterStart, iterEnd, result, pattern))
-        {
-            vector<double> pair;
-            str = result[0];
-            // 0.742979获取
-            //cout << xcord[0] << endl;
-            regex_search(str, xcord, pattern1);
-            regex_search(str, ycord, pattern2);
-            //cout << xcord.str(0) << endl;
-            //cout << ycord.str(0).substr(2,ycord.str(0).length()) << endl;
-            // rows 480
-            // cols 640
-            x = stod(xcord.str(0)) * camera_frame.cols;
-            y = stod(ycord.str(0).substr(2,ycord.str(0).length())) * camera_frame.rows;
-            pair.push_back(x);
-            pair.push_back(y);
-            cordinate_collection.push_back(pair);
-            iterStart = result[0].second;
-        }   
+        cordinate_collection = generate_vector(str, camera_frame.cols, camera_frame.rows);
         for(vector<double> cordinate : cordinate_collection){
               cout << cordinate[0] << " " <<cordinate[1] << endl;
         }

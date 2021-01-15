@@ -72,6 +72,7 @@ cc_library(
         "//mediapipe/framework/port:status",
         "//mediapipe/calculators/util:rect_to_render_data_calculator",
 	"//mediapipe/framework/formats:rect_cc_proto",
+	"//mediapipe/tools:generate_vector",
     ],
 )
 
@@ -93,6 +94,7 @@ cc_library(
         "//mediapipe/framework/port:status",
         "//mediapipe/calculators/util:rect_to_render_data_calculator",
 	"//mediapipe/framework/formats:rect_cc_proto",
+	"//mediapipe/tools:generate_vector",
     ],
 )
 
@@ -114,6 +116,7 @@ cc_library(
         "//mediapipe/framework/port:status",
         "//mediapipe/calculators/util:rect_to_render_data_calculator",
 	"//mediapipe/framework/formats:rect_cc_proto",
+	"//mediapipe/tools:generate_vector",
     ],
 )
 

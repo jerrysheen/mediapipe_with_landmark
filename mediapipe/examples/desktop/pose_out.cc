@@ -37,6 +37,9 @@
 
 
 #include <typeinfo>
+#include <regex>
+#include <vector>
+#include "mediapipe/tools/generate_vector.h"
 
 // input and output streams to be used/retrieved by calculators
 constexpr char kInputStream[] = "input_video";
@@ -163,9 +166,14 @@ DEFINE_string(output_video_path, "",
       
       auto& landmarks = landmark_packet.Get<mediapipe::NormalizedLandmarkList>();
       std::cout << "waiting...............\n";
-      std::cout << landmarks.DebugString();
+      string str =  landmarks.DebugString();
       std::cout << "...............\n";
-      
+      // using regular expression to get the cordinate.
+      vector<vector<double>> cordinate_collection;
+      cordinate_collection = generate_vector(str, camera_frame.cols, camera_frame.rows);
+      for(vector<double> cordinate : cordinate_collection){
+          cout << cordinate[0] << " " <<cordinate[1] << endl;
+      }      
       // you can check type using this code......
       // std:: cout << typeid(landmarks.DebugString()).name();
       //

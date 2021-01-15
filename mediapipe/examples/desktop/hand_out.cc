@@ -34,6 +34,12 @@
 #include "mediapipe/framework/formats/rect.pb.h"
 #include "mediapipe/calculators/util/rect_to_render_data_calculator.pb.h"
 
+
+#include <regex>
+#include <vector>
+#include "mediapipe/tools/generate_vector.h"
+
+
 // input and output streams to be used/retrieved by calculators
 constexpr char kInputStream[] = "input_video";
 constexpr char kOutputStream[] = "output_video";
@@ -172,7 +178,17 @@ DEFINE_string(output_video_path, "",
       auto& landmarks = landmarks_packet.Get<std::vector<::mediapipe::NormalizedLandmarkList>>();
       std::cout << frame_timestamp_us << std::endl;
       for (const ::mediapipe::NormalizedLandmarkList& landmark : landmarks) {
-        std::cout << landmark.DebugString();
+        // start to deal with string using regular expression.
+        //string str = landmark.DebugString();
+        string str = landmark.DebugString();
+        // insert code here...
+
+        // using regular expression to get the cordinate.
+        vector<vector<double>> cordinate_collection;
+        cordinate_collection = generate_vector(str, camera_frame.cols, camera_frame.rows);
+        for(vector<double> cordinate : cordinate_collection){
+              cout << cordinate[0] << " " <<cordinate[1] << endl;
+        }
       }
 
       // hand landmarks_rect  print

@@ -26,22 +26,9 @@
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
 
-//....................................................................................
-//Take stream from /mediapipe/graphs/hand_tracking/hand_detection_desktop_live.pbtxt
-// RendererSubgraph - LANDMARKS:hand_landmarks
-#include "mediapipe/calculators/util/landmarks_to_render_data_calculator.pb.h"
-#include "mediapipe/framework/formats/landmark.pb.h"
-
-//....................................................................................
-
-
 constexpr char kInputStream[] = "input_video";
 constexpr char kOutputStream[] = "output_video";
 constexpr char kWindowName[] = "MediaPipe";
-//....................................................................................
-// define landmark constant
-constexpr char kLandmarksStream[] = "hand_landmarks";
-//....................................................................................
 
 DEFINE_string(
     calculator_graph_config_file, "",
@@ -53,8 +40,7 @@ DEFINE_string(output_video_path, "",
               "Full path of where to save result (.mp4 only). "
               "If not provided, show result in a window.");
 
-::mediapipe::Status RunMPPGraph() {
-  // 配置读取图的信息
+mediapipe::Status RunMPPGraph() {
   std::string calculator_graph_config_contents;
   MP_RETURN_IF_ERROR(mediapipe::file::GetContents(
       FLAGS_calculator_graph_config_file, &calculator_graph_config_contents));
@@ -75,7 +61,6 @@ DEFINE_string(output_video_path, "",
     capture.open(FLAGS_input_video_path);
   } else {
     capture.open(0);
-    
   }
   RET_CHECK(capture.isOpened());
 
@@ -93,17 +78,10 @@ DEFINE_string(output_video_path, "",
   LOG(INFO) << "Start running the calculator graph.";
   ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
                    graph.AddOutputStreamPoller(kOutputStream));
-  //....................................................................................
-  // 需要定义这个kLndmarkStearm, 并且在图中添加一个outputStream
-  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller_landmark,
-            graph.AddOutputStreamPoller(kLandmarksStream));
-  //....................................................................................
   MP_RETURN_IF_ERROR(graph.StartRun({}));
 
   LOG(INFO) << "Start grabbing and processing frames.";
   bool grab_frames = true;
-
-  //..........
   while (grab_frames) {
     // Capture opencv camera or video frame.
     cv::Mat camera_frame_raw;
@@ -123,7 +101,6 @@ DEFINE_string(output_video_path, "",
     }
 
     // Wrap Mat into an ImageFrame.
-    // 将图像数据Mat 转换成ImageFrame类型
     auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
         mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows,
         mediapipe::ImageFrame::kDefaultAlignmentBoundary);
@@ -138,25 +115,11 @@ DEFINE_string(output_video_path, "",
                           .At(mediapipe::Timestamp(frame_timestamp_us))));
 
     // Get the graph result packet, or stop if that fails.
-    // 这个包本来是数据流的类型，现在把他转换成能够输出的文件
     mediapipe::Packet packet;
     if (!poller.Next(&packet)) break;
     auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
-//....................................................................................
-// 接受新的数据流
-
-    // Get the graph result packet, or stop if that fails.
-    mediapipe::Packet landmark_packet;
-    //Polling the poller to get landmark packet
-    if (!poller_landmark.Next(&landmark_packet)) break;
-    // 接受了这个数据流
-    auto& output_landmarks = landmark_packet.Get<std::vector<::mediapipe::NormalizedLandmark>>();
-
-//....................................................................................
-
     // Convert back to opencv for display or saving.
-    // output_frame_mat 这个是直接可以输出的文件
     cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
     cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
     if (save_video) {
@@ -174,9 +137,6 @@ DEFINE_string(output_video_path, "",
       const int pressed_key = cv::waitKey(5);
       if (pressed_key >= 0 && pressed_key != 255) grab_frames = false;
     }
-    for (const ::mediapipe::NormalizedLandmark& landmark : output_landmarks) {
-          std::cout << landmark.DebugString();
-    }
   }
 
   LOG(INFO) << "Shutting down.";
@@ -190,7 +150,7 @@ int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   mediapipe::Status run_status = RunMPPGraph();
   if (!run_status.ok()) {
-    LOG(ERROR) << "Failed to run the graph:... " << run_status.message();
+    LOG(ERROR) << "Failed to run the graph: " << run_status.message();
     return EXIT_FAILURE;
   } else {
     LOG(INFO) << "Success!";
