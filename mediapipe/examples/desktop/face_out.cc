@@ -220,14 +220,19 @@ mediapipe::Status RunMPPGraph() {
             regex_search(str, ycord, pattern2);
             //cout << xcord.str(0) << endl;
             //cout << ycord.str(0).substr(2,ycord.str(0).length()) << endl;
-            x = stod(xcord.str(0));
-            y = stod(ycord.str(0).substr(2,ycord.str(0).length()));
+            // rows 480
+            // cols 640
+            x = stod(xcord.str(0)) * camera_frame.cols;
+            y = stod(ycord.str(0).substr(2,ycord.str(0).length())) * camera_frame.rows;
             pair.push_back(x);
             pair.push_back(y);
             cordinate_collection.push_back(pair);
             iterStart = result[0].second;
-            
         }   
+        for(vector<double> cordinate : cordinate_collection){
+              cout << cordinate[0] << " " <<cordinate[1] << endl;
+        }
+
       }
       
 
